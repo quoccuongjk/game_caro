@@ -9,7 +9,7 @@ public class Game {
     public Player player2;
     public Player currentPlayer;
     public Cell[][] cells;
-    //public MutableLiveData<Player> winner = new MutableLiveData<>();
+    public List<Cell> listCells = new ArrayList<>();
 
     public Game() {
         cells = new Cell[Constant.BOARD_SIZE][Constant.BOARD_SIZE];
@@ -18,19 +18,26 @@ public class Game {
                 cells[i][j] = new Cell(null);
             }
         }
+        listCells.clear();
+        listCells.addAll(listCellForView());
+
         //
 
         player1 = new Player(PlayerValue.VALUE_X);
         player2 = new Player(PlayerValue.VALUE_O);
         currentPlayer = player1;
     }
-    public Game(Player player, Cell[][] cells) {
-        player1 = new Player(PlayerValue.VALUE_X);
-        player2 = new Player(PlayerValue.VALUE_O);
-        currentPlayer = player;
-        this.cells = cells;
+
+    public void reloadGame(Game storedGame) {
+        this.player1 = storedGame.player1;
+        this.player2 = storedGame.player2;
+        this.currentPlayer = storedGame.currentPlayer;
+        this.cells = storedGame.cells;
+        listCells.clear();
+        listCells.addAll(listCellForView());
     }
-    public List<Cell> listCellForView() {
+
+    private List<Cell> listCellForView() {
         List<Cell> result = new ArrayList<>();
         for (int i = 0; i < Constant.BOARD_SIZE; i++) {
             for (int j = 0; j < Constant.BOARD_SIZE; j++) {
@@ -147,5 +154,7 @@ public class Game {
                 cells[i][j].setPlayer(null);
             }
         }
+        listCells.clear();
+        listCells.addAll(listCellForView());
     }
 }

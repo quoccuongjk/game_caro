@@ -1,7 +1,5 @@
 package com.example.game_caro.model;
 
-import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 
 public class Player {

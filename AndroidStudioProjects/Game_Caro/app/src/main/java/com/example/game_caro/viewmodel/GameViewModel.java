@@ -2,51 +2,35 @@ package com.example.game_caro.viewmodel;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
+import android.util.Log;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.game_caro.model.Cell;
-import com.example.game_caro.model.CellDAO;
-import com.example.game_caro.model.CellDB;
 import com.example.game_caro.model.Constant;
 import com.example.game_caro.model.Game;
-import com.example.game_caro.model.Player;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewModel extends ViewModel {
+    SharedPreferences sharedPreferences;
     private Game game;
     public MutableLiveData<Boolean> isEndGame = new MutableLiveData<>();
     public MutableLiveData<Boolean> isPlayer = new MutableLiveData<>();
     public MutableLiveData<String> winner = new MutableLiveData<>();
 
-    public Game getGame() {
-        return game;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
-    public void init() {
+    public void init(Context context) {
         game = new Game();
         isPlayer.postValue(false);
+        sharedPreferences = context.getSharedPreferences("dataGame", Context.MODE_PRIVATE);
     }
-    public void init1(String strjson) {
-        game = restartGame(strjson);
-        if(game.currentPlayer == game.player1) {
-            isPlayer.postValue(false);
-        } else {
-            isPlayer.postValue(true);
-        }
+
+    public List<Cell> listCellForView() {
+        return game.listCells;
     }
+
     public boolean isEmpty(int index) {
         int[] rc = convertIndexToRC(index);
         int r = rc[0];
@@ -93,23 +77,33 @@ public class GameViewModel extends ViewModel {
             isPlayer.postValue(false);
         }
     }
+
     public void resetGame() {
         game.reset();
         isEndGame.postValue(false);
         isPlayer.postValue(false);
     }
-    public String saveCell() {
-        Cell[][] cells = game.cells;
-        Player player = game.currentPlayer;
-        Game saveGame = new Game(player,cells );
-        Gson gson = new Gson();
-        String strjson = gson.toJson(saveGame);
-        return strjson;
-    }
-    public Game restartGame(String strjson) {
-        Gson gson = new Gson();
-        Game game = gson.fromJson(strjson,Game.class);
-        return game;
 
+    public void saveGame() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(game);
+        editor.putString("data", jsonString);
+        editor.apply();
+    }
+
+    public void restartGame() {
+        String strJson = sharedPreferences.getString("data", "");
+        Gson gson = new Gson();
+        Game gameRestart = gson.fromJson(strJson, Game.class);
+        if (gameRestart == null)
+            return;
+        game.reloadGame(gameRestart);
+
+        if (game.currentPlayer == game.player1) {
+            isPlayer.postValue(false);
+        } else {
+            isPlayer.postValue(true);
+        }
     }
 }

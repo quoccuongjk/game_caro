@@ -16,12 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameAdapter extends RecyclerView.Adapter<GameHolder> {
-    private List<Cell> cellList = new ArrayList<>();
+    private List<Cell> cellList;
     private OnClick onClick;
 
-    public GameAdapter(List<Cell> cellList,OnClick onClick) {
-        this.cellList.clear();
-        this.cellList.addAll(cellList);
+    public GameAdapter(List<Cell> cellList, OnClick onClick) {
+        this.cellList = cellList;
         notifyDataSetChanged();
         this.onClick = onClick;
     }
@@ -29,7 +28,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameHolder> {
     @NonNull
     @Override
     public GameHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cell,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cell, parent, false);
         return new GameHolder(view);
     }
 
@@ -48,6 +47,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameHolder> {
 
 class GameHolder extends RecyclerView.ViewHolder {
     TextView tv_cell;
+
     public GameHolder(@NonNull View itemView) {
         super(itemView);
         tv_cell = itemView.findViewById(R.id.tv_cell);
