@@ -1,55 +1,41 @@
 package com.example.game_caro.viewmodel;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.game_caro.model.Cell;
-import com.example.game_caro.model.CellDAO;
-import com.example.game_caro.model.CellDB;
-import com.example.game_caro.model.Constant;
 import com.example.game_caro.model.Game;
-import com.example.game_caro.model.Player;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewModel extends ViewModel {
-    public Game game;
+    SharedPreferences sharedPreferences;
+    private Game game;
     public MutableLiveData<Boolean> isEndGame = new MutableLiveData<>();
     public MutableLiveData<Boolean> isPlayer = new MutableLiveData<>();
     public MutableLiveData<String> winner = new MutableLiveData<>();
-    public void init() {
+
+    public void init(Context context) {
         game = new Game();
         isPlayer.postValue(false);
+        sharedPreferences = context.getSharedPreferences("dataGame", MODE_PRIVATE);
     }
-    public void init1(String strjson){
-        game = restartGame(strjson);
-        if(game.currentPlayer == game.player1) {
-            isPlayer.postValue(false);
-        } else {
-            isPlayer.postValue(true);
-        }
+    public List<Cell> listCellForView() {
+        return game.listCells;
     }
     public boolean isEmpty(int index) {
-        int[] rc = convertIndexToRC(index);
-        int r = rc[0];
-        int c = rc[1];
-        return game.cells[r][c].isEmpty();
+        return game.isEmpty(index);
     }
 
     public void onClickedAtCell(int index) {
-        int[] rc = convertIndexToRC(index);
-        int r = rc[0];
-        int c = rc[1];
-        game.cells[r][c].setPlayer(game.currentPlayer);
+        game.setPlayerAt(index);
+
         if (game.isGameEnd()) {
             isEndGame.postValue(true);
             if (game.currentPlayer == game.player1) {
@@ -57,23 +43,12 @@ public class GameViewModel extends ViewModel {
 
             } else {
                 winner.postValue("player O");
-
             }
-            if (game.isBoardFull()){
+            if (game.isBoardFull()) {
                 winner.postValue("no one");
             }
-
         }
         switchPlayer();
-    }
-
-    private int[] convertIndexToRC(int index) {
-        int[] output = new int[2];
-        int r = index / Constant.BOARD_SIZE;
-        int c = index % Constant.BOARD_SIZE;
-        output[0] = r;
-        output[1] = c;
-        return output;
     }
 
     public void switchPlayer() {
@@ -90,31 +65,26 @@ public class GameViewModel extends ViewModel {
         isEndGame.postValue(false);
         isPlayer.postValue(false);
     }
-    public String saveCell(){
-        Cell[][] cells = game.cells;
-        Player player = game.currentPlayer;
-        Game saveGame = new Game(player,cells );
-        Gson gson = new Gson();
-        String strjson = gson.toJson(saveGame);
-        return strjson;
-    }
-    public Game restartGame(String strjson){
-        Gson gson = new Gson();
-        Game game = gson.fromJson(strjson,Game.class);
-        return game;
 
+    public void saveGame() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(game);
+        editor.putString("data",jsonString);
+        editor.apply();
     }
-    public List<Cell> viewCellRestart(String strjson){
-        Game game = restartGame(strjson);
-        if (game == null){
-            return null;
+    public void restartGame() {
+        String strJson = sharedPreferences.getString("data", "");
+        Gson gson = new Gson();
+        Game gameRestart = gson.fromJson(strJson,Game.class);
+        if (gameRestart == null)
+            return;
+        game.reloadGame(gameRestart);
+        if (game.currentPlayer == game.player1) {
+            isPlayer.postValue(false);
+        } else {
+            isPlayer.postValue(true);
         }
-        List<Cell> result = new ArrayList<>();
-        for (int i = 0; i < Constant.BOARD_SIZE; i++) {
-            for (int j = 0; j < Constant.BOARD_SIZE; j++) {
-                result.add(game.cells[i][j]);
-            }
-        }
-        return result;
     }
+
 }
