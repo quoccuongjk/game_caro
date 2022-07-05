@@ -38,6 +38,14 @@ public class Cell {
         }
         return player.getPlayerValue() == PlayerValue.VALUE_X ? "X" : "O";
     }
+
+    public String getPrintValue() {
+        if (isEmpty()) {
+            return "-";
+        }
+        return player.getPlayerValue() == PlayerValue.VALUE_X ? "X" : "O";
+    }
+
     public boolean isEmpty() {
         return player == null || player.getPlayerValue() == PlayerValue.VALUE_EMPTY;
     }

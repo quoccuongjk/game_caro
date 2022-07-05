@@ -1,7 +1,5 @@
 package com.example.game_caro.model;
 
-import android.text.TextUtils;
-
 import androidx.annotation.NonNull;
 
 public class Player {
@@ -12,7 +10,7 @@ public class Player {
     }
 
     public Player(String vl) {
-        if (vl.equalsIgnoreCase("null")) {
+        if (vl.equalsIgnoreCase("-")) {
             playerValue = PlayerValue.VALUE_EMPTY;
         } else {
             if (vl.equalsIgnoreCase("X")) {
@@ -30,6 +28,14 @@ public class Player {
     @NonNull
     @Override
     public String toString() {
-        return playerValue == PlayerValue.VALUE_X ? "X" : (playerValue == PlayerValue.VALUE_O ? "O" : "null");
+        return playerValue == PlayerValue.VALUE_X ? "X" : (playerValue == PlayerValue.VALUE_O ? "O" : "-");
+    }
+
+    public boolean isSamePlayer(Player player) {
+        return this.playerValue == player.playerValue;
+    }
+
+    public boolean isSamePlayer(PlayerValue playerValue) {
+        return this.playerValue == playerValue;
     }
 }
