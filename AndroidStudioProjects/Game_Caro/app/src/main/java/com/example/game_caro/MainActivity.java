@@ -47,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btnNewGame = findViewById(R.id.btnNewGame);
         gameViewModel.init();
         recyclerView = findViewById(R.id.rcv_game);
-        cellList = gameViewModel.game.listCellForView();
-        gameAdapter = new GameAdapter(cellList, index -> {
+        gameAdapter = new GameAdapter(gameViewModel.getGame().listCellForView(), index -> {
             if (!gameViewModel.isEmpty(index)) {
                 return;
             }
@@ -92,11 +91,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String strgson = sharedPreferences.getString("data","");
-                Game game = gameViewModel.restartGame(strgson);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 gameViewModel.init1(strgson);
-                cellList.clear();
-                cellList.addAll(game.listCellForView());
+                gameAdapter = new GameAdapter(gameViewModel.getGame().listCellForView(), index -> {
+                    if (!gameViewModel.isEmpty(index)) {
+                        return;
+                    }
+                    gameViewModel.onClickedAtCell(index);
+                    gameAdapter.notifyItemChanged(index);
+                });
                 editor.remove("data");
                 editor.commit();
                 gameViewModel.restartGame(strgson);

@@ -22,15 +22,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewModel extends ViewModel {
-    public Game game;
+    private Game game;
     public MutableLiveData<Boolean> isEndGame = new MutableLiveData<>();
     public MutableLiveData<Boolean> isPlayer = new MutableLiveData<>();
     public MutableLiveData<String> winner = new MutableLiveData<>();
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
     public void init() {
         game = new Game();
         isPlayer.postValue(false);
     }
-    public void init1(String strjson){
+    public void init1(String strjson) {
         game = restartGame(strjson);
         if(game.currentPlayer == game.player1) {
             isPlayer.postValue(false);
@@ -57,9 +66,8 @@ public class GameViewModel extends ViewModel {
 
             } else {
                 winner.postValue("player O");
-
             }
-            if (game.isBoardFull()){
+            if (game.isBoardFull()) {
                 winner.postValue("no one");
             }
 
@@ -90,7 +98,7 @@ public class GameViewModel extends ViewModel {
         isEndGame.postValue(false);
         isPlayer.postValue(false);
     }
-    public String saveCell(){
+    public String saveCell() {
         Cell[][] cells = game.cells;
         Player player = game.currentPlayer;
         Game saveGame = new Game(player,cells );
@@ -98,23 +106,10 @@ public class GameViewModel extends ViewModel {
         String strjson = gson.toJson(saveGame);
         return strjson;
     }
-    public Game restartGame(String strjson){
+    public Game restartGame(String strjson) {
         Gson gson = new Gson();
         Game game = gson.fromJson(strjson,Game.class);
         return game;
 
-    }
-    public List<Cell> viewCellRestart(String strjson){
-        Game game = restartGame(strjson);
-        if (game == null){
-            return null;
-        }
-        List<Cell> result = new ArrayList<>();
-        for (int i = 0; i < Constant.BOARD_SIZE; i++) {
-            for (int j = 0; j < Constant.BOARD_SIZE; j++) {
-                result.add(game.cells[i][j]);
-            }
-        }
-        return result;
     }
 }

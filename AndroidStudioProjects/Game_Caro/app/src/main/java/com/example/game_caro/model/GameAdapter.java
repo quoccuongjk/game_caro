@@ -18,9 +18,7 @@ import java.util.List;
 public class GameAdapter extends RecyclerView.Adapter<GameHolder> {
     private List<Cell> cellList = new ArrayList<>();
     private OnClick onClick;
-    public void setData(List<Cell> cells){
-        cellList = cells;
-    }
+
     public GameAdapter(List<Cell> cellList,OnClick onClick) {
         this.cellList.clear();
         this.cellList.addAll(cellList);

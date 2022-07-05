@@ -32,16 +32,13 @@ public class Cell {
     public void setPlayer(Player player) {
         this.player = player;
     }
-
     public String getValue() {
         if (isEmpty()) {
             return "";
         }
         return player.getPlayerValue() == PlayerValue.VALUE_X ? "X" : "O";
     }
-
-
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return player == null || player.getPlayerValue() == PlayerValue.VALUE_EMPTY;
     }
 }
